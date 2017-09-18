@@ -25,6 +25,7 @@ public class MyController implements Initializable{
 	@FXML
 	MenuButton PuzzleSize;
 	
+	
 	private int puzzleSize;
 	private int[][] puzzle;
 	
@@ -49,7 +50,6 @@ public class MyController implements Initializable{
 		return puzzle;
 	}
 	
-	@FXML
 	public void setSize5(ActionEvent event) {
 		setPuzzleSize(5);
 	}
@@ -102,9 +102,8 @@ public class MyController implements Initializable{
 			PuzzleBox.appendText("\n");
 		}
 	}
-	
-	public void showPuzzle(ActionEvent event) {
-		if (getPuzzle() == null) {
+	public void showPuzzle(ActionEvent event){
+		if(getPuzzle()==null){
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("No Puzzle Exists");
 			alert.setContentText("You must generate a puzzle first then show it.");
@@ -112,7 +111,15 @@ public class MyController implements Initializable{
 			alert.showAndWait();
 			return;
 		}
-		
 		showPuzzle(getPuzzle());
+	}
+	public void showSolution(ActionEvent event){
+		
+	}
+	public void doHillClimb(ActionEvent event){
+		
+	}
+	public void doSimAnnealing(ActionEvent event){
+		
 	}
 }
