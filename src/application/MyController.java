@@ -78,7 +78,7 @@ public class MyController implements Initializable{
 		showPuzzle(puzzleMatrix);
 	}
 	
-	private int[][] createNewPuzzle(int size){
+	private int[][] createNewPuzzle(int size) {
 		int n = getPuzzleSize();
 		int[][] puzzle = new int[n][n];
 		
