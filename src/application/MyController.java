@@ -49,6 +49,7 @@ public class MyController implements Initializable{
 		return puzzle;
 	}
 	
+	@FXML
 	public void setSize5(ActionEvent event) {
 		setPuzzleSize(5);
 	}
@@ -100,5 +101,18 @@ public class MyController implements Initializable{
 			}
 			PuzzleBox.appendText("\n");
 		}
+	}
+	
+	public void showPuzzle(ActionEvent event) {
+		if (getPuzzle() == null) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("No Puzzle Exists");
+			alert.setContentText("You must generate a puzzle first then show it.");
+			
+			alert.showAndWait();
+			return;
+		}
+		
+		showPuzzle(getPuzzle());
 	}
 }
