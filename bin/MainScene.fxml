@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="386.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MyController">
+   <children>
+      <Text layoutX="375.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Value:" wrappingWidth="56.13671875" />
+      <TextField id="ValueDisplay" fx:id="ValueDisplay" editable="false" layoutX="422.0" layoutY="23.0" prefHeight="25.0" prefWidth="66.0" />
+      <Text layoutX="540.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Compute Time:" />
+      <TextField id="ComputeDisplay" fx:id="ComputeDisplay" editable="false" layoutX="627.0" layoutY="23.0" prefHeight="25.0" prefWidth="91.0" />
+      <Text layoutX="375.0" layoutY="74.0" strokeType="OUTSIDE" strokeWidth="0.0" text="n = " />
+      <MenuButton fx:id="PuzzleSize" layoutX="403.0" layoutY="57.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="66.0">
+        <items>
+          <MenuItem mnemonicParsing="false" onAction="#setSize5" text="5" />
+          <MenuItem mnemonicParsing="false" onAction="#setSize7" text="7" />
+          <MenuItem mnemonicParsing="false" onAction="#setSize9" text="9" />
+          <MenuItem mnemonicParsing="false" onAction="#setSize11" text="11" />
+        </items>
+      </MenuButton>
+      <Button layoutX="553.0" layoutY="57.0" mnemonicParsing="false" onAction="#createPuzzle" prefHeight="25.0" prefWidth="165.0" text="New Puzzle" />
+      <Button fx:id="ShowPuzzleButton" layoutX="373.0" layoutY="103.0" mnemonicParsing="false" onAction="#showPuzzle" prefHeight="25.0" prefWidth="165.0" text="Show Puzzle" />
+      <Button fx:id="ShowSolutionButton" layoutX="553.0" layoutY="103.0" mnemonicParsing="false" onAction="#showSolution" prefHeight="25.0" prefWidth="165.0" text="Show Solution" />
+      <Pane id="HillClimbBorder" layoutX="373.0" layoutY="147.0" prefHeight="144.0" prefWidth="165.0" style="-fx-border-color: black;">
+         <children>
+            <Button fx:id="HillClimbButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#doHillClimb" prefHeight="25.0" prefWidth="138.0" text="Hill Climb" />
+            <Text layoutX="14.0" layoutY="67.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of climbs:" />
+            <TextField layoutX="116.0" layoutY="50.0" prefHeight="25.0" prefWidth="38.0" />
+            <Text layoutX="14.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Iterations per climb:" />
+            <TextField layoutX="123.0" layoutY="81.0" prefHeight="25.0" prefWidth="38.0" />
+            <Text layoutX="14.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="p = " />
+            <TextField layoutX="36.0" layoutY="107.0" prefHeight="25.0" prefWidth="38.0" />
+         </children>
+      </Pane>
+      <Pane id="StimAnnealingBorder" layoutX="563.0" layoutY="147.0" prefHeight="144.0" prefWidth="165.0" style="-fx-border-color: black;">
+         <children>
+            <Button fx:id="SimulatedAnnealingButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#doSimAnnealing" prefHeight="25.0" prefWidth="138.0" text="Simulated Annealing" />
+            <Text layoutX="14.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Iterations:" />
+            <TextField layoutX="70.0" layoutY="49.0" prefHeight="25.0" prefWidth="56.0" />
+            <Text layoutX="14.0" layoutY="95.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Initial Temperature:" />
+            <TextField layoutX="121.0" layoutY="78.0" prefHeight="25.0" prefWidth="38.0" />
+            <Text layoutX="14.0" layoutY="122.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Decay rate:" />
+            <TextField layoutX="76.0" layoutY="105.0" prefHeight="25.0" prefWidth="46.0" />
+         </children>
+      </Pane>
+      <TextArea fx:id="PuzzleBox" editable="false" layoutX="29.0" layoutY="47.0" prefHeight="279.0" prefWidth="296.0" />
+   </children>
+</AnchorPane>
