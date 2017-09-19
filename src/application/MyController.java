@@ -24,7 +24,8 @@ public class MyController implements Initializable{
 	TextArea PuzzleBox;
 	@FXML
 	MenuButton PuzzleSize;
-	
+	@FXML
+	TextField numClimbs;
 	
 	private int puzzleSize;
 	private int[][] puzzle;
@@ -117,7 +118,19 @@ public class MyController implements Initializable{
 		
 	}
 	public void doHillClimb(ActionEvent event){
-		
+		//System.out.println(numClimbs.getText());
+		int numberOfClimbs=0;
+		try{
+			numberOfClimbs = Integer.parseInt(numClimbs.getText());
+		}catch(NumberFormatException ex){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Number of Hill climbs is Not an integer");
+			alert.setContentText("You must input an integer for number of climbs.");
+			alert.showAndWait();
+		}
+			System.out.println(numberOfClimbs);
+			//Above code is just to pull the number of climbs inserted by user, handling the error case that they do not put an integer
+			
 	}
 	public void doSimAnnealing(ActionEvent event){
 		
