@@ -10,7 +10,7 @@
    <children>
       <Text layoutX="375.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Value:" wrappingWidth="56.13671875" />
       <TextField id="ValueDisplay" fx:id="ValueDisplay" editable="false" layoutX="422.0" layoutY="23.0" prefHeight="25.0" prefWidth="66.0" />
-      <Text layoutX="540.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Compute Time:" />
+      <Text layoutX="519.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Compute Time:" />
       <TextField id="ComputeDisplay" fx:id="ComputeDisplay" editable="false" layoutX="627.0" layoutY="23.0" prefHeight="25.0" prefWidth="91.0" />
       <Text layoutX="375.0" layoutY="74.0" strokeType="OUTSIDE" strokeWidth="0.0" text="n = " />
       <MenuButton fx:id="PuzzleSize" layoutX="403.0" layoutY="57.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="66.0">
@@ -27,23 +27,23 @@
       <Pane id="HillClimbBorder" layoutX="373.0" layoutY="147.0" prefHeight="144.0" prefWidth="165.0" style="-fx-border-color: black;">
          <children>
             <Button fx:id="HillClimbButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#doHillClimb" prefHeight="25.0" prefWidth="138.0" text="Hill Climb" />
-            <Text layoutX="14.0" layoutY="67.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of climbs:" />
-            <TextField layoutX="116.0" layoutY="50.0" prefHeight="25.0" prefWidth="38.0" />
+            <Text  layoutX="14.0" layoutY="67.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of climbs:" />
+            <TextField fx:id="numClimbs" layoutX="116.0" layoutY="50.0" prefHeight="25.0" prefWidth="38.0" />
             <Text layoutX="14.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Iterations per climb:" />
-            <TextField layoutX="123.0" layoutY="81.0" prefHeight="25.0" prefWidth="38.0" />
+            <TextField fx:id="numIterations" layoutX="123.0" layoutY="81.0" prefHeight="25.0" prefWidth="38.0" />
             <Text layoutX="14.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="p = " />
-            <TextField layoutX="36.0" layoutY="107.0" prefHeight="25.0" prefWidth="38.0" />
+            <TextField fx:id="pValue" layoutX="36.0" layoutY="107.0" prefHeight="25.0" prefWidth="38.0" />
          </children>
       </Pane>
       <Pane id="StimAnnealingBorder" layoutX="563.0" layoutY="147.0" prefHeight="144.0" prefWidth="165.0" style="-fx-border-color: black;">
          <children>
             <Button fx:id="SimulatedAnnealingButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#doSimAnnealing" prefHeight="25.0" prefWidth="138.0" text="Simulated Annealing" />
             <Text layoutX="14.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Iterations:" />
-            <TextField layoutX="70.0" layoutY="49.0" prefHeight="25.0" prefWidth="56.0" />
+            <TextField fx:id="numIterationsA" layoutX="70.0" layoutY="49.0" prefHeight="25.0" prefWidth="56.0" />
             <Text layoutX="14.0" layoutY="95.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Initial Temperature:" />
-            <TextField layoutX="121.0" layoutY="78.0" prefHeight="25.0" prefWidth="38.0" />
+            <TextField fx:id="initTemp" layoutX="121.0" layoutY="78.0" prefHeight="25.0" prefWidth="38.0" />
             <Text layoutX="14.0" layoutY="122.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Decay rate:" />
-            <TextField layoutX="76.0" layoutY="105.0" prefHeight="25.0" prefWidth="46.0" />
+            <TextField fx:id="decayRate" layoutX="76.0" layoutY="105.0" prefHeight="25.0" prefWidth="46.0" />
          </children>
       </Pane>
       <TextArea fx:id="PuzzleBox" editable="false" layoutX="29.0" layoutY="47.0" prefHeight="279.0" prefWidth="296.0" />

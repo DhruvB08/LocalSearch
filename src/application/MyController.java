@@ -24,7 +24,18 @@ public class MyController implements Initializable{
 	TextArea PuzzleBox;
 	@FXML
 	MenuButton PuzzleSize;
-	
+	@FXML
+	TextField numClimbs;
+	@FXML
+	TextField numIterations;
+	@FXML
+	TextField pValue;
+	@FXML
+	TextField numIterationsA;
+	@FXML
+	TextField initTemp;
+	@FXML
+	TextField decayRate;
 	
 	private int puzzleSize;
 	private int[][] puzzle;
@@ -118,8 +129,89 @@ public class MyController implements Initializable{
 	}
 	public void doHillClimb(ActionEvent event){
 		
+		int numberOfClimbs=0;
+		try{
+			numberOfClimbs = Integer.parseInt(numClimbs.getText());
+		}catch(NumberFormatException ex){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Number of Hill climbs is Not an integer");
+			alert.setContentText("You must input an integer for number of climbs.");
+			alert.showAndWait();
+		}
+		System.out.println(numberOfClimbs);
+		//Above code is just to pull the number of climbs inserted by user, handling the error case that they do not put an integer
+
+		
+		
+		
+		int numberOfIterations=0;
+		try{
+			numberOfIterations = Integer.parseInt(numIterations.getText());
+		}catch(NumberFormatException ex){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Number of iterations is Not an integer");
+			alert.setContentText("You must input an integer for number of iterations.");
+			alert.showAndWait();
+		}
+		System.out.println(numberOfIterations);
+		//Above code is just to pull the number of iterations inserted by user, handling the error case that they do not put an integer
+		//Needs to fix the error case where there is no input		
+
+		
+		
+		
+		int pValueInserted=0;
+		try{
+			pValueInserted = Integer.parseInt(pValue.getText());
+		}catch(NumberFormatException ex){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Number of Hill climbs is Not an integer");
+			alert.setContentText("You must input a proper number for p value.");
+			alert.showAndWait();
+		}
+		System.out.println(pValueInserted);
+		//Above code is just to pull the p value inserted by user, handling the error case that they do not put an integer
+		//Also for p value needs to be read as a decimal not an int
 	}
 	public void doSimAnnealing(ActionEvent event){
+		int iterationsA=0;
+		try{
+			iterationsA = Integer.parseInt(numIterationsA.getText());
+		}catch(NumberFormatException ex){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Number of Simulated Annealing Iterations is Not an integer");
+			alert.setContentText("You must input an integer for number of Iterations.");
+			alert.showAndWait();
+		}
+		System.out.println(iterationsA);
+	
+		
+		
+		
+		int initialTemperature=0;
+		try{
+			initialTemperature = Integer.parseInt(initTemp.getText());
+		}catch(NumberFormatException ex){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("initial Temperature is Not an integer");
+			alert.setContentText("You must input an integer for initial temperature.");
+			alert.showAndWait();
+		}
+		System.out.println(initialTemperature);
+		
+		
+		
+		
+		int decay=0;
+		try{
+			decay = Integer.parseInt(decayRate.getText());
+		}catch(NumberFormatException ex){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Decay Rate is Not an integer");
+			alert.setContentText("You must input a proper number for decay Rate value.");
+			alert.showAndWait();
+		}
+		System.out.println(decay);
 		
 	}
 }
