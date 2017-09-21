@@ -154,6 +154,9 @@ public class MyController implements Initializable{
 		
 		int[][] puzzle = getPuzzle();
 		int n = getPuzzleSize();
+		int[][] solutionArray = new int[n][n]; 
+		int count=1;
+		doBFS(0,0,solutionArray,count);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				if (i == 0 && j == 0) {
@@ -168,6 +171,90 @@ public class MyController implements Initializable{
 				}
 			}
 			PuzzleBox.appendText("\n");
+		}
+		//To show the solution array
+		solutionArray[0][0]=0;
+		printSolution(solutionArray,n);
+	}
+	public void printSolution(int[][] arr, int n){
+		for(int row=0;row<n;row++){
+			for(int column=0;column<n;column++){
+				if(row==0 && column==0){
+					System.out.print("0 ");
+					continue;
+				}
+				if(arr[row][column]==0){
+					System.out.print("X ");
+					continue;
+				}
+				System.out.print(arr[row][column]+ " ");
+			}
+			System.out.println("");
+		}
+	}
+	public void doBFS(int row, int column,int[][] solutionArray,int count){
+		int[][] puzzle = getPuzzle();
+		int n = getPuzzleSize();
+		int moves = puzzle[row][column];
+		boolean d = false,r=false,l=false,u = false;
+		//Down
+		if(row+moves<n){
+			if(solutionArray[row+moves][column]==0){
+				solutionArray[row+moves][column]=count;
+				d=true;
+				
+			}
+			if(!d&&solutionArray[row+moves][column]>count){
+				solutionArray[row+moves][column]=count;
+				d=true;
+			}
+		}
+		//Right
+		if(column+moves<n){
+			if(solutionArray[row][column+moves]==0){
+				solutionArray[row][column+moves]=count;
+				r=true;
+			}
+			if(!r&&solutionArray[row][column+moves]>count){
+				solutionArray[row][column+moves]=count;
+				r=true;
+			}
+		}
+		//Left
+		if(column-moves>=0){
+			if(solutionArray[row][column-moves]==0){
+				solutionArray[row][column-moves]=count;
+				l=true;
+			}
+			if(!l&&solutionArray[row][column-moves]>count){
+				solutionArray[row][column-moves]=count;
+				l=true;
+			}
+			
+		}
+		//Up
+		if(row-moves>=0){
+			if(solutionArray[row-moves][column]==0){
+				solutionArray[row-moves][column]=count;
+				u=true;
+			}
+			if(!u&&solutionArray[row-moves][column]>count){
+				solutionArray[row-moves][column]=count;
+				u=true;
+			}
+		}
+		count++;
+		if(d){
+			doBFS(row+moves,column,solutionArray,count);
+		}
+		if(r){
+			doBFS(row,column+moves,solutionArray,count);
+		}
+		if(l){
+			doBFS(row,column-moves,solutionArray,count);
+		}
+		if(u){
+			doBFS(row-moves,column,solutionArray,count);
 		}
 	}
 	
