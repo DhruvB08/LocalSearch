@@ -153,10 +153,7 @@ public class MyController implements Initializable{
 		PuzzleBox.setText("");
 		
 		int[][] puzzle = getPuzzle();
-		int n = getPuzzleSize();
-		int[][] solutionArray = new int[n][n]; 
-		int count=1;
-		doBFS(0,0,solutionArray,count);
+		int n = puzzle.length;
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				if (i == 0 && j == 0) {
@@ -170,28 +167,11 @@ public class MyController implements Initializable{
 					}
 				}
 			}
+			
 			PuzzleBox.appendText("\n");
 		}
-		//To show the solution array
-		solutionArray[0][0]=0;
-		printSolution(solutionArray,n);
 	}
-	public void printSolution(int[][] arr, int n){
-		for(int row=0;row<n;row++){
-			for(int column=0;column<n;column++){
-				if(row==0 && column==0){
-					System.out.print("0 ");
-					continue;
-				}
-				if(arr[row][column]==0){
-					System.out.print("X ");
-					continue;
-				}
-				System.out.print(arr[row][column]+ " ");
-			}
-			System.out.println("");
-		}
-	}
+	
 	public void doBFS(int row, int column,int[][] solutionArray,int count){
 		int[][] puzzle = getPuzzle();
 		int n = getPuzzleSize();
@@ -350,7 +330,6 @@ public class MyController implements Initializable{
 	//Pure Hill Climbing, given the number of climbs to do
 	private int[][] pureHillClimb(int numClimbs) {
 		int[][] currPuzzle = getPuzzle();
-		int[][] newPuzzle = currPuzzle;
 		
 		Random random = new Random();
 		int n = currPuzzle.length;
@@ -367,9 +346,12 @@ public class MyController implements Initializable{
 			minNum = 1;
 			int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
 			
-			newPuzzle[x][y] = newVal;
-			if (valueFunction(newPuzzle) >= valueFunction(currPuzzle)) {
-				currPuzzle = newPuzzle;
+			int currVal = currPuzzle[x][y];
+			int currPuzzleValue = valueFunction(currPuzzle);
+			currPuzzle[x][y] = newVal;
+			int newPuzzleValue = valueFunction(currPuzzle);
+			if (newPuzzleValue < currPuzzleValue) {
+				currPuzzle[x][y] = currVal;
 			}
 		}
 		
@@ -379,7 +361,6 @@ public class MyController implements Initializable{
 	//Random Walk, given the number of climbs and probability
 	private int[][] withRandomWalk(int numClimbs, double prob) {
 		int[][] currPuzzle = getPuzzle();
-		int[][] newPuzzle = currPuzzle;
 		
 		Random random = new Random();
 		int n = currPuzzle.length;
@@ -396,11 +377,17 @@ public class MyController implements Initializable{
 			minNum = 1;
 			int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
 			
-			newPuzzle[x][y] = newVal;
-			if (valueFunction(newPuzzle) >= valueFunction(currPuzzle)) {
-				currPuzzle = newPuzzle;
+			int prevVal = currPuzzle[x][y];
+			int prevPuzzleVal = valueFunction(currPuzzle);
+			currPuzzle[x][y] = newVal;
+			int newPuzzleVal = valueFunction(currPuzzle);
+			
+			if (newPuzzleVal >= prevPuzzleVal) {
+				continue;
 			} else if (random.nextDouble() <= prob) {
-				currPuzzle = newPuzzle;
+				continue;
+			} else {
+				currPuzzle[x][y] = prevVal;
 			}
 		}
 		
@@ -410,14 +397,12 @@ public class MyController implements Initializable{
 	//Random Restarts, given the number of climbs and iterations per climb
 	private int[][] withRandomRestarts(int numClimbs, int itsPerClimb) {
 		int[][] currPuzzle = getPuzzle();
-		int[][] newPuzzle = currPuzzle;
 		int[][] bestPuzzle = currPuzzle;
 		
 		Random random = new Random();
 		int n = currPuzzle.length;
 		for (int j = 0; j < numClimbs; j++) {
 			currPuzzle = createNewPuzzle(n);
-			newPuzzle = currPuzzle;
 			for (int i = 0; i < itsPerClimb; i++) {
 				int maxNum = n - 1, minNum = 0;
 				int x = random.nextInt(maxNum - minNum + 1) + minNum;
@@ -431,9 +416,15 @@ public class MyController implements Initializable{
 				minNum = 1;
 				int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
 				
-				newPuzzle[x][y] = newVal;
-				if (valueFunction(newPuzzle) >= valueFunction(currPuzzle)) {
-					currPuzzle = newPuzzle;
+				int prevVal = currPuzzle[x][y];
+				int prevPuzzleValue = valueFunction(currPuzzle);
+				currPuzzle[x][y] = newVal;
+				int newPuzzleValue = valueFunction(currPuzzle);
+			
+				if (newPuzzleValue >= prevPuzzleValue) {
+					continue;
+				} else {
+					currPuzzle[x][y] = prevVal;
 				}
 			}
 			
@@ -502,7 +493,6 @@ public class MyController implements Initializable{
 		}
 		
 		int[][] currPuzzle = getPuzzle();
-		int[][] newPuzzle = currPuzzle;
 		
 		Random random = new Random();
 		int n = currPuzzle.length;
@@ -519,15 +509,21 @@ public class MyController implements Initializable{
 			minNum = 1;
 			int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
 			
-			newPuzzle[x][y] = newVal;
-			if (valueFunction(newPuzzle) >= valueFunction(currPuzzle)) {
-				currPuzzle = newPuzzle;
+			int currVal = currPuzzle[x][y];
+			int currPuzzleValue = valueFunction(currPuzzle);
+			currPuzzle[x][y] = newVal;
+			int newPuzzleValue = valueFunction(currPuzzle);
+			
+			if (newPuzzleValue >= currPuzzleValue) {
+				continue;
 			} else {
-				double numerator = valueFunction(newPuzzle) - valueFunction(currPuzzle);
+				double numerator = newPuzzleValue - currPuzzleValue;
 				double power = numerator / startTemp;
 				double prob = Math.pow(Math.E, power);
 				if (random.nextDouble() <= prob) {
-					currPuzzle = newPuzzle;
+					continue;
+				} else {
+					currPuzzle[x][y] = currVal;
 				}
 			}
 			
@@ -573,7 +569,11 @@ public class MyController implements Initializable{
 	//placeholder for solution algorithm
 	//returns 0 when no solution
 	private int valueFunction(int[][] puzzle, int index1, int index2) {
-		return 0;
+		int n = puzzle.length;
+		int[][] solArray = new int[n][n];
+		doBFS(0, 0, solArray, 1);
+		
+		return solArray[index1][index2];
 	}
 	
 	private void showValue(int[][] puzzle) {
