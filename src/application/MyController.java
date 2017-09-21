@@ -117,7 +117,11 @@ public class MyController implements Initializable{
 		PuzzleBox.setText("");
 		for (int i = 0; i < puzzleMatrix.length; i++) {
 			for (int j = 0; j < puzzleMatrix[0].length; j++) {
-				PuzzleBox.appendText(Integer.toString(puzzleMatrix[i][j]) + "\t");
+				if (i == puzzleMatrix.length - 1 && j == puzzleMatrix[0].length - 1) {
+					PuzzleBox.appendText("G");
+				} else {
+					PuzzleBox.appendText(Integer.toString(puzzleMatrix[i][j]) + "\t");
+				}
 			}
 			PuzzleBox.appendText("\n");
 		}
@@ -129,7 +133,6 @@ public class MyController implements Initializable{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("No Puzzle Exists");
 			alert.setContentText("You must generate a puzzle first then show it.");
-			
 			alert.showAndWait();
 			return;
 		}
@@ -139,7 +142,33 @@ public class MyController implements Initializable{
 	
 	//Clicking the show solution button
 	public void showSolution(ActionEvent event) {
+		if (getPuzzle() == null) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("No Puzzle Exists");
+			alert.setContentText("You must generate a puzzle first then you can show the solution");
+			alert.showAndWait();
+			return;
+		}
 		
+		PuzzleBox.setText("");
+		
+		int[][] puzzle = getPuzzle();
+		int n = getPuzzleSize();
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (i == 0 && j == 0) {
+					PuzzleBox.appendText("0" + "\t");
+				} else {
+					int val = valueFunction(puzzle, i, j);
+					if (val == 0) {
+						PuzzleBox.appendText("X" + "\t");
+					} else {
+						PuzzleBox.appendText(Integer.toString(val) + "\t");
+					}
+				}
+			}
+			PuzzleBox.appendText("\n");
+		}
 	}
 	
 	//Clicking the Hill Climb button
@@ -149,6 +178,14 @@ public class MyController implements Initializable{
 	 * possible input: number of climbs, p value
 	 */
 	public void doHillClimb(ActionEvent event) {
+		if (getPuzzle() == null) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("No starting puzzle");
+			alert.setContentText("You must generate a strting puzzle first before improving it");
+			alert.showAndWait();
+			return;
+		}
+		
 		long startTime = Calendar.getInstance().getTimeInMillis();
 		boolean randomRestarts = false;
 		boolean randomWalk = false;
@@ -229,7 +266,7 @@ public class MyController implements Initializable{
 		int[][] newPuzzle = currPuzzle;
 		
 		Random random = new Random();
-		int n = getPuzzleSize();
+		int n = currPuzzle.length;
 		for (int i = 0; i < numClimbs; i++) {
 			int maxNum = n - 1, minNum = 0;
 			int x = random.nextInt(maxNum - minNum + 1) + minNum;
@@ -258,7 +295,7 @@ public class MyController implements Initializable{
 		int[][] newPuzzle = currPuzzle;
 		
 		Random random = new Random();
-		int n = getPuzzleSize();
+		int n = currPuzzle.length;
 		for (int i = 0; i < numClimbs; i++) {
 			int maxNum = n - 1, minNum = 0;
 			int x = random.nextInt(maxNum - minNum + 1) + minNum;
@@ -290,7 +327,7 @@ public class MyController implements Initializable{
 		int[][] bestPuzzle = currPuzzle;
 		
 		Random random = new Random();
-		int n = getPuzzleSize();
+		int n = currPuzzle.length;
 		for (int j = 0; j < numClimbs; j++) {
 			currPuzzle = createNewPuzzle(n);
 			newPuzzle = currPuzzle;
@@ -322,46 +359,98 @@ public class MyController implements Initializable{
 	}
 	
 	//Clicking the Simulated Annealing button
+	/* Simulated Annealing
+	 * required inputs: iterations, starting temperature, decay rate
+	 */
 	public void doSimAnnealing(ActionEvent event){
-		int iterationsA=0;
-		try{
-			iterationsA = Integer.parseInt(numIterationsA.getText());
-		}catch(NumberFormatException ex){
+		if (getPuzzle() == null) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Number of Simulated Annealing Iterations is Not an integer");
+			alert.setTitle("No starting puzzle");
+			alert.setContentText("You must generate a strting puzzle first before improving it");
+			alert.showAndWait();
+			return;
+		}
+		
+		long startTime = Calendar.getInstance().getTimeInMillis();
+		
+		int numIterations = 0;
+		try {
+			numIterations = Integer.parseInt(numIterationsA.getText());
+		} catch (NumberFormatException ex) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Number of Iterations is not an integer");
 			alert.setContentText("You must input an integer for number of Iterations.");
 			alert.showAndWait();
+			return;
 		}
-		System.out.println(iterationsA);
 	
-		
-		
-		
-		int initialTemperature=0;
-		try{
-			initialTemperature = Integer.parseInt(initTemp.getText());
-		}catch(NumberFormatException ex){
+		double startTemp = 0;
+		try {
+			startTemp = Double.parseDouble(initTemp.getText());
+		} catch (NumberFormatException ex) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("initial Temperature is Not an integer");
-			alert.setContentText("You must input an integer for initial temperature.");
+			alert.setTitle("initial Temperature is not a number");
+			alert.setContentText("You must input a number for initial temperature.");
 			alert.showAndWait();
+			return;
 		}
-		System.out.println(initialTemperature);
-		
-		
-		
-		
-		int decay=0;
-		try{
-			decay = Integer.parseInt(decayRate.getText());
-		}catch(NumberFormatException ex){
+			
+		double decay = 0;
+		try {
+			decay = Double.parseDouble(decayRate.getText());
+		} catch (NumberFormatException ex) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Decay Rate is Not an integer");
-			alert.setContentText("You must input a proper number for decay Rate value.");
+			alert.setTitle("Decay Rate is not a number");
+			alert.setContentText("You must input a number for the decay rate.");
 			alert.showAndWait();
+			return;
 		}
-		System.out.println(decay);
 		
+		if (decay < 0 || decay > 1) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Decay rate invalid");
+			alert.setContentText("Decay rate must be between 0 and 1.");
+			alert.showAndWait();
+			return;
+		}
+		
+		int[][] currPuzzle = getPuzzle();
+		int[][] newPuzzle = currPuzzle;
+		
+		Random random = new Random();
+		int n = currPuzzle.length;
+		for (int i = 0; i < numIterations; i++) {
+			int maxNum = n - 1, minNum = 0;
+			int x = random.nextInt(maxNum - minNum + 1) + minNum;
+			int y = random.nextInt(maxNum - minNum + 1) + minNum;
+			while (x == maxNum && y == maxNum) {
+				x = random.nextInt(maxNum - minNum + 1) + minNum;
+				y = random.nextInt(maxNum - minNum + 1) + minNum;
+			}
+			
+			maxNum = Math.max(n - x, n - y) - 1;
+			minNum = 1;
+			int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
+			
+			newPuzzle[x][y] = newVal;
+			if (valueFunction(newPuzzle) >= valueFunction(currPuzzle)) {
+				currPuzzle = newPuzzle;
+			} else {
+				double numerator = valueFunction(newPuzzle) - valueFunction(currPuzzle);
+				double power = numerator / startTemp;
+				double prob = Math.pow(Math.E, power);
+				if (random.nextDouble() <= prob) {
+					currPuzzle = newPuzzle;
+				}
+			}
+			
+			startTemp = startTemp * decay;
+		}
+		
+		showComputeTime(startTime);
+		showValue(currPuzzle);
+		setPuzzle(currPuzzle);
+		showPuzzle(currPuzzle);
 	}
 	
 	private void showComputeTime(long startTime) {
@@ -371,8 +460,32 @@ public class MyController implements Initializable{
 		ComputeDisplay.setText(Long.toString(elapsed));
 	}
 	
-	//placeholder for solution algorithm
+	//getting solution at goal cell
 	private int valueFunction(int[][] puzzle) {
+		int n = getPuzzleSize();
+		int sol = valueFunction(puzzle, n - 1, n - 1);
+		
+		if (sol == 0) {
+			int numFails = 0;
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					if (i == n - 1 && j == n - 1) {
+						continue;
+					} else if (valueFunction(puzzle, i, j) == 0) {
+						numFails++;
+					}
+				}
+			}
+			
+			return (-1 * numFails);
+		}
+		
+		return sol;
+	}
+	
+	//placeholder for solution algorithm
+	//returns 0 when no solution
+	private int valueFunction(int[][] puzzle, int index1, int index2) {
 		return 0;
 	}
 	
