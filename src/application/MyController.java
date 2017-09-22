@@ -178,7 +178,7 @@ public class MyController implements Initializable{
 	
 	public void doBFS(int row, int column,int[][] solutionArray,int count){
 		int[][] puzzle = getPuzzle();
-		int n = getPuzzleSize();
+		int n = puzzle.length;
 		int moves = puzzle[row][column];
 		boolean d = false,r=false,l=false,u = false;
 		//Down
