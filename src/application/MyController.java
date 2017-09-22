@@ -1,5 +1,8 @@
 package application;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 
 public class MyController implements Initializable{
@@ -248,7 +252,7 @@ public class MyController implements Initializable{
 		if (getPuzzle() == null) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("No starting puzzle");
-			alert.setContentText("You must generate a strting puzzle first before improving it");
+			alert.setContentText("You must generate a starting puzzle first before improving it");
 			alert.showAndWait();
 			return;
 		}
@@ -545,7 +549,7 @@ public class MyController implements Initializable{
 	
 	//getting solution at goal cell
 	private int valueFunction(int[][] puzzle) {
-		int n = getPuzzleSize();
+		int n = puzzle.length;
 		int sol = valueFunction(puzzle, n - 1, n - 1);
 		
 		if (sol == 0) {
@@ -578,5 +582,128 @@ public class MyController implements Initializable{
 	
 	private void showValue(int[][] puzzle) {
 		ValueDisplay.setText(Integer.toString(valueFunction(puzzle)));
+	}
+	
+	@FXML TextField TargetedChangeIter;
+	
+	/* The only way to reach the goal is by being in one of the squares above
+	 * the goal cell, or one of the squares to the left of the goal square.
+	 * Randomly picking one of those squares, and changing that value, targets
+	 * the squares most likely needed to reach the goal cell. It is also a 
+	 * repeatable process, so the number of iterations corresponds to how many
+	 * times the program should attempt changing one of those squares to improve
+	 * the puzzle's difficulty.
+	 */
+	public void ownApproach(ActionEvent event) {
+		if (getPuzzle() == null) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("No puzzle found");
+			alert.setContentText("You must generate a puzzle first, then improve it");
+			alert.showAndWait();
+			return;
+		}
+		
+		int numIterations = 0;
+		try {
+			numIterations = Integer.parseInt(TargetedChangeIter.getText());
+		} catch (NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Invalid Input");
+			alert.setContentText("The number of iterations must be a proper integer value.");
+			alert.showAndWait();
+			return;
+		}
+		
+		long startTime = Calendar.getInstance().getTimeInMillis();
+		
+		int[][] puzzle = getPuzzle();
+		int n = puzzle.length;
+		Random random = new Random();
+		for (int i = 0; i < numIterations; i++) {
+			boolean aboveGoalSqr = random.nextDouble() <= 0.5 ? true : false;
+			
+			int min = 0;
+			int max = n - 2;
+			int prevSquare;
+			int index = random.nextInt(max - min + 1) + min;
+			if (!aboveGoalSqr) {
+				prevSquare = puzzle[n - 1][index];
+			} else {
+				prevSquare = puzzle[index][n - 1];
+			}
+			
+			min = 1;
+			max = n - index - 1;
+			int newSquare = random.nextInt(max - min + 1) + min;
+			
+			int prevPuzzleValue = valueFunction(puzzle);
+			if (!aboveGoalSqr) {
+				puzzle[n - 1][index] = newSquare;
+			} else {
+				puzzle[index][n - 1] = newSquare;
+			}
+			int newPuzzleValue = valueFunction(puzzle);
+			
+			if (newPuzzleValue < prevPuzzleValue) {
+				if (!aboveGoalSqr) {
+					puzzle[n - 1][index] = prevSquare;
+				} else {
+					puzzle[index][n - 1] = prevSquare;
+				}
+			}
+		}
+		
+		showValue(puzzle);
+		setPuzzle(puzzle);
+		showComputeTime(startTime);
+		showPuzzle(puzzle);
+	}
+	
+	//reading from file here
+	public void puzzleFromFile(ActionEvent event) {
+		TextInputDialog dialog = new TextInputDialog();
+		dialog.setTitle("Filename");
+		dialog.setContentText("Please enter the name of the file:");
+		dialog.showAndWait();
+		String filename = dialog.getResult();
+		
+		try {
+			long startTime = Calendar.getInstance().getTimeInMillis();
+			FileReader fileReader = new FileReader(filename);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			
+			int n = Integer.parseInt(bufferedReader.readLine());
+			int[][] puzzle = new int[n][n];
+			
+			for (int i = 0; i < n; i++) {
+				String line = bufferedReader.readLine();
+				String[] splitLine = line.split("\\s+");
+				
+				for (int j = 0; j < n; j++) {
+					int value = Integer.parseInt(splitLine[j]);
+					puzzle[i][j] = value;
+				}
+			}
+			
+			/*
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					System.out.print(puzzle[i][j] + "\t");
+				}
+				System.out.println("");
+			}
+			*/
+			
+			setPuzzle(puzzle);
+			showPuzzle(puzzle);
+			showValue(puzzle);
+			showComputeTime(startTime);
+		} catch (IOException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Invalid file");
+			alert.setContentText("File not found or invalid format, ignoring file");
+			alert.showAndWait();
+			return;
+		}
 	}
 }
