@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 
@@ -97,7 +99,7 @@ public class MyController implements Initializable{
 	
 	//private method to create a new puzzle given the dimensions
 	private int[][] createNewPuzzle(int size) {
-		int n = getPuzzleSize();
+		int n = size;
 		int[][] puzzle = new int[n][n];
 		
 		Random random = new Random();
@@ -176,8 +178,7 @@ public class MyController implements Initializable{
 		}
 	}
 	
-	public void doBFS(int row, int column,int[][] solutionArray,int count){
-		int[][] puzzle = getPuzzle();
+	public void doBFS(int row, int column,int[][] solutionArray,int count, int[][] puzzle){
 		int n = puzzle.length;
 		int moves = puzzle[row][column];
 		boolean d = false,r=false,l=false,u = false;
@@ -228,17 +229,17 @@ public class MyController implements Initializable{
 			}
 		}
 		count++;
-		if(d){
-			doBFS(row+moves,column,solutionArray,count);
+		if (d) {
+			doBFS(row + moves, column, solutionArray, count, puzzle);
 		}
 		if(r){
-			doBFS(row,column+moves,solutionArray,count);
+			doBFS(row,column+moves,solutionArray,count, puzzle);
 		}
 		if(l){
-			doBFS(row,column-moves,solutionArray,count);
+			doBFS(row,column-moves,solutionArray,count, puzzle);
 		}
 		if(u){
-			doBFS(row-moves,column,solutionArray,count);
+			doBFS(row-moves,column,solutionArray,count, puzzle);
 		}
 	}
 	
@@ -419,7 +420,7 @@ public class MyController implements Initializable{
 				maxNum = Math.max(n - x, n - y) - 1;
 				minNum = 1;
 				int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-				
+		
 				int prevVal = currPuzzle[x][y];
 				int prevPuzzleValue = valueFunction(currPuzzle);
 				currPuzzle[x][y] = newVal;
@@ -575,7 +576,7 @@ public class MyController implements Initializable{
 	private int valueFunction(int[][] puzzle, int index1, int index2) {
 		int n = puzzle.length;
 		int[][] solArray = new int[n][n];
-		doBFS(0, 0, solArray, 1);
+		doBFS(0, 0, solArray, 1, puzzle);
 		
 		return solArray[index1][index2];
 	}
@@ -685,15 +686,6 @@ public class MyController implements Initializable{
 				}
 			}
 			
-			/*
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < n; j++) {
-					System.out.print(puzzle[i][j] + "\t");
-				}
-				System.out.println("");
-			}
-			*/
-			
 			setPuzzle(puzzle);
 			showPuzzle(puzzle);
 			showValue(puzzle);
@@ -705,5 +697,386 @@ public class MyController implements Initializable{
 			alert.showAndWait();
 			return;
 		}
+	}
+	
+	@FXML MenuButton PlotChoice;
+	public void generatePlotValues(ActionEvent event) {
+		String plotChoice = PlotChoice.getText();
+		List<Integer> numIters = new ArrayList<Integer>();
+		List<Integer> values = new ArrayList<Integer>();
+		
+		if (getPuzzle() == null) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("No starting puzzle");
+			alert.setContentText("You must generate a starting puzzle first before improving it.");
+			alert.showAndWait();
+			return;
+		}
+		
+		int n = 0;
+		if (plotChoice.equals("Pure Hill Climbing")) {
+			int numberOfClimbs = 0;
+			try {
+				numberOfClimbs = Integer.parseInt(numClimbs.getText());
+			} catch (NumberFormatException ex) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Number of Hill climbs is not an integer");
+				alert.setContentText("You must input an integer for number of climbs.");
+				alert.showAndWait();
+				return;
+			}
+			
+			int[][] puzzle = getPuzzle();
+			n = puzzle.length;
+			for (int k = 0; k < 55; k++) {
+				Random random = new Random();
+				
+				for (int i = 0; i < numberOfClimbs; i++) {
+					int maxNum = n - 1, minNum = 0;
+					int x = random.nextInt(maxNum - minNum + 1) + minNum;
+					int y = random.nextInt(maxNum - minNum + 1) + minNum;
+					while (x == maxNum && y == maxNum) {
+						x = random.nextInt(maxNum - minNum + 1) + minNum;
+						y = random.nextInt(maxNum - minNum + 1) + minNum;
+					}
+					
+					maxNum = Math.max(n - x, n - y) - 1;
+					minNum = 1;
+					int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
+					
+					int currVal = puzzle[x][y];
+					int currPuzzleValue = valueFunction(puzzle);
+					puzzle[x][y] = newVal;
+					int newPuzzleValue = valueFunction(puzzle);
+					if (newPuzzleValue < currPuzzleValue) {
+						puzzle[x][y] = currVal;
+					}
+				}
+				
+				setPuzzle(puzzle);
+				numIters.add(numberOfClimbs);
+				values.add(valueFunction(puzzle));
+				
+				numberOfClimbs += 10;
+				puzzle = createNewPuzzle(n);
+			}
+		} else if (plotChoice.equals("Random Restarts")) {
+			int numberOfClimbs = 0;
+			try {
+				numberOfClimbs = Integer.parseInt(numClimbs.getText());
+			} catch (NumberFormatException ex) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Number of Hill climbs is not an integer");
+				alert.setContentText("You must input an integer for number of climbs.");
+				alert.showAndWait();
+				return;
+			}
+			
+			int numberOfIterations = 0;
+			try {
+				numberOfIterations = Integer.parseInt(numIterations.getText());
+			} catch (NumberFormatException ex) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Number of iterations is not valid");
+				alert.setContentText("You must input an integer for number of iterations.");
+				alert.showAndWait();
+				return;
+			}
+			
+			int[][] puzzle = getPuzzle();
+			n = puzzle.length;
+			for (int k = 0; k < 55; k++) {
+				Random random = new Random();
+				int[][] bestPuzzle = new int[n][n];
+				
+				for (int i = 0; i < numberOfClimbs; i++) {
+					puzzle = createNewPuzzle(n);
+					
+					for (int j = 0; j < numberOfIterations; j++) {
+						int maxNum = n - 1, minNum = 0;
+						int x = random.nextInt(maxNum - minNum + 1) + minNum;
+						int y = random.nextInt(maxNum - minNum + 1) + minNum;
+						while (x == maxNum && y == maxNum) {
+							x = random.nextInt(maxNum - minNum + 1) + minNum;
+							y = random.nextInt(maxNum - minNum + 1) + minNum;
+						}
+						
+						maxNum = Math.max(n - x, n - y) - 1;
+						minNum = 1;
+						int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
+						
+						int currVal = puzzle[x][y];
+						int currPuzzleValue = valueFunction(puzzle);
+						puzzle[x][y] = newVal;
+						int newPuzzleValue = valueFunction(puzzle);
+						
+						if (newPuzzleValue < currPuzzleValue) {
+							puzzle[x][y] = currVal;
+						}
+					}
+					
+					if (valueFunction(puzzle) >= valueFunction(bestPuzzle)) {
+						bestPuzzle = puzzle;
+					}
+				}
+				
+				setPuzzle(puzzle);
+				numIters.add(numberOfClimbs);
+				values.add(valueFunction(bestPuzzle));
+				
+				numberOfClimbs += 10;
+				puzzle = createNewPuzzle(n);
+			}
+		} else if (plotChoice.equals("Random Walk")) {
+			int numberOfClimbs = 0;
+			try {
+				numberOfClimbs = Integer.parseInt(numClimbs.getText());
+			} catch (NumberFormatException ex) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Number of Hill climbs is not an integer");
+				alert.setContentText("You must input an integer for number of climbs.");
+				alert.showAndWait();
+				return;
+			}
+			
+			double p = 0;
+			try {
+				p = Double.parseDouble(pValue.getText());
+			} catch (NumberFormatException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Invalid value");
+				alert.setContentText("You must input a number between 0 and 1 for the probability");
+				alert.showAndWait();
+				return;
+			}
+			
+			if (p > 1 || p < 0) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Invalid value");
+				alert.setContentText("The value for probability must be between 0 and 1");
+				alert.showAndWait();
+				return;
+			}
+			
+			int[][] puzzle = getPuzzle();
+			n = puzzle.length;
+			for (int k = 0; k < 55; k++) {
+				Random random = new Random();
+				
+				for (int i = 0; i < numberOfClimbs; i++) {
+					int maxNum = n - 1, minNum = 0;
+					int x = random.nextInt(maxNum - minNum + 1) + minNum;
+					int y = random.nextInt(maxNum - minNum + 1) + minNum;
+					while (x == maxNum && y == maxNum) {
+						x = random.nextInt(maxNum - minNum + 1) + minNum;
+						y = random.nextInt(maxNum - minNum + 1) + minNum;
+					}
+					
+					maxNum = Math.max(n - x, n - y) - 1;
+					minNum = 1;
+					int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
+					
+					int currVal = puzzle[x][y];
+					int currPuzzleValue = valueFunction(puzzle);
+					puzzle[x][y] = newVal;
+					int newPuzzleValue = valueFunction(puzzle);
+					
+					if (newPuzzleValue < currPuzzleValue && random.nextDouble() > p) {
+						puzzle[x][y] = currVal;
+					}
+				}
+				
+				setPuzzle(puzzle);
+				numIters.add(numberOfClimbs);
+				values.add(valueFunction(puzzle));
+				
+				numberOfClimbs += 10;
+				puzzle = createNewPuzzle(n);
+			}
+		} else if (plotChoice.equals("Simulated Annealing")) {
+			int numIterations = 0;
+			try {
+				numIterations = Integer.parseInt(numIterationsA.getText());
+			} catch (NumberFormatException ex) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Number of Iterations is not an integer");
+				alert.setContentText("You must input an integer for number of Iterations.");
+				alert.showAndWait();
+				return;
+			}
+		
+			double startTemp = 0;
+			try {
+				startTemp = Double.parseDouble(initTemp.getText());
+			} catch (NumberFormatException ex) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("initial Temperature is not a number");
+				alert.setContentText("You must input a number for initial temperature.");
+				alert.showAndWait();
+				return;
+			}
+				
+			double decay = 0;
+			try {
+				decay = Double.parseDouble(decayRate.getText());
+			} catch (NumberFormatException ex) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Decay Rate is not a number");
+				alert.setContentText("You must input a number for the decay rate.");
+				alert.showAndWait();
+				return;
+			}
+			
+			if (decay < 0 || decay > 1) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Decay rate invalid");
+				alert.setContentText("Decay rate must be between 0 and 1.");
+				alert.showAndWait();
+				return;
+			}
+			
+			int[][] puzzle = getPuzzle();
+			n = puzzle.length;
+			double initTemp = startTemp;
+			for (int k = 0; k < 55; k++) {
+				Random random = new Random();
+				
+				for (int i = 0; i < numIterations; i++) {
+					int maxNum = n - 1, minNum = 0;
+					int x = random.nextInt(maxNum - minNum + 1) + minNum;
+					int y = random.nextInt(maxNum - minNum + 1) + minNum;
+					while (x == maxNum && y == maxNum) {
+						x = random.nextInt(maxNum - minNum + 1) + minNum;
+						y = random.nextInt(maxNum - minNum + 1) + minNum;
+					}
+					
+					maxNum = Math.max(n - x, n - y) - 1;
+					minNum = 1;
+					int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
+					
+					int currVal = puzzle[x][y];
+					int currPuzzleValue = valueFunction(puzzle);
+					puzzle[x][y] = newVal;
+					int newPuzzleValue = valueFunction(puzzle);
+					
+					if (newPuzzleValue >= currPuzzleValue) {
+						continue;
+					} else {
+						double numerator = newPuzzleValue - currPuzzleValue;
+						double power = numerator / startTemp;
+						double prob = Math.pow(Math.E, power);
+						if (random.nextDouble() <= prob) {
+							continue;
+						} else {
+							puzzle[x][y] = currVal;
+						}
+					}
+					
+					startTemp = startTemp * decay;
+				}
+				
+				setPuzzle(puzzle);
+				numIters.add(numIterations);
+				values.add(valueFunction(puzzle));
+				
+				numIterations += 10;
+				puzzle = createNewPuzzle(n);
+				startTemp = initTemp;
+			}
+		} else if (plotChoice.equals("Targeted Change")) {
+			int numIterations = 0;
+			try {
+				numIterations = Integer.parseInt(TargetedChangeIter.getText());
+			} catch (NumberFormatException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Invalid Input");
+				alert.setContentText("The number of iterations must be a proper integer value.");
+				alert.showAndWait();
+				return;
+			}
+			
+			int[][] puzzle = getPuzzle();
+			n = puzzle.length;
+			for (int k = 0; k < 55; k++) {
+				Random random = new Random();
+				
+				for (int i = 0; i < numIterations; i++) {
+					boolean aboveGoalSqr = random.nextDouble() <= 0.5 ? true : false;
+					
+					int min = 0;
+					int max = n - 2;
+					int prevSquare;
+					int index = random.nextInt(max - min + 1) + min;
+					if (!aboveGoalSqr) {
+						prevSquare = puzzle[n - 1][index];
+					} else {
+						prevSquare = puzzle[index][n - 1];
+					}
+					
+					min = 1;
+					max = n - index - 1;
+					int newSquare = random.nextInt(max - min + 1) + min;
+					
+					int prevPuzzleValue = valueFunction(puzzle);
+					if (!aboveGoalSqr) {
+						puzzle[n - 1][index] = newSquare;
+					} else {
+						puzzle[index][n - 1] = newSquare;
+					}
+					int newPuzzleValue = valueFunction(puzzle);
+					
+					if (newPuzzleValue < prevPuzzleValue) {
+						if (!aboveGoalSqr) {
+							puzzle[n - 1][index] = prevSquare;
+						} else {
+							puzzle[index][n - 1] = prevSquare;
+						}
+					}
+				}
+				
+				setPuzzle(puzzle);
+				numIters.add(numIterations);
+				values.add(valueFunction(puzzle));
+				
+				numIterations += 10;
+				puzzle = createNewPuzzle(n);
+			}
+		} else {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Missing choice");
+			alert.setContentText("You must specify what you want to plot first.");
+			alert.showAndWait();
+			return;
+		}
+		
+		System.out.println("");
+		System.out.println(plotChoice);
+		System.out.println("n = " + n);
+		System.out.print("Iterations: " + "\t");
+		for (Integer i : numIters) {
+			System.out.print(i + "\t");
+		}
+		System.out.println("");
+		System.out.print("Result Value:" + "\t");
+		for (Integer i : values) {
+			System.out.print(i + "\t");
+		}
+		System.out.println("");
+	}
+	
+	public void setHillClimb(ActionEvent event) {
+		PlotChoice.setText("Pure Hill Climbing");
+	}
+	public void setRandomRestarts(ActionEvent event) {
+		PlotChoice.setText("Random Restarts");
+	}
+	public void setRandomWalk(ActionEvent event) {
+		PlotChoice.setText("Random Walk");
+	}
+	public void setSimAnneal(ActionEvent event) {
+		PlotChoice.setText("Simulated Annealing");
+	}
+	public void setTargetChange(ActionEvent event) {
+		PlotChoice.setText("Targeted Change");
 	}
 }
