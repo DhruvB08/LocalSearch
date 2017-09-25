@@ -562,15 +562,15 @@ public class MyController implements Initializable{
 	//getting solution at goal cell
 	private int valueFunction(int[][] puzzle) {
 		int n = puzzle.length;
-		int sol = valueFunction(puzzle, n - 1, n - 1);
+		int[][] solArray = new int[n][n];
+		doBFS(0,0,solArray,1,puzzle);
+		int sol = solArray[n-1][n-1];
 		
 		if (sol == 0) {
 			int numFails = 0;
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < n; j++) {
-					if (i == n - 1 && j == n - 1) {
-						continue;
-					} else if (valueFunction(puzzle, i, j) == 0) {
+					if (solArray[i][j] == 0) {
 						numFails++;
 					}
 				}
