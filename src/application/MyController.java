@@ -102,20 +102,31 @@ public class MyController implements Initializable{
 		int n = size;
 		int[][] puzzle = new int[n][n];
 		
-		Random random = new Random();
-		int minNum = 1, maxNum;
+		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				maxNum = Math.max(n - i, n - j) - 1;
+				
 				if (i == n - 1 && j == n - 1) {
 					puzzle[i][j] = 0;
 				} else {
-					puzzle[i][j] = random.nextInt(maxNum - minNum + 1) + minNum;
+					puzzle[i][j] = randomLegalValue(n,i,j);
 				}
 			}
 		}
 		
 		return puzzle;
+	}
+	public int randomLegalValue(int size, int i, int j){
+		int mxL=0,mxR=0,mxU=0,mxD=0;
+		int maxValue=0;
+		Random random = new Random();
+		mxL=j;
+		mxR=size-j-1;
+		mxU=i;
+		mxD=size-i-1;
+		maxValue=Math.max(Math.max(mxL,mxR),Math.max(mxU,mxD));
+		
+		return random.nextInt(maxValue)+1;
 	}
 	
 	//private method for printing the puzzle onto GUI
