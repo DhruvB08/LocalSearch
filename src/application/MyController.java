@@ -4,11 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -18,17 +15,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.BorderPane;
 
 public class MyController implements Initializable{
 	
-	@FXML TextArea PuzzleBox;
-	@FXML MenuButton PuzzleSize;
 	@FXML TextField numClimbs;
 	@FXML TextField numIterations;
 	@FXML TextField pValue;
@@ -38,29 +31,22 @@ public class MyController implements Initializable{
 	@FXML TextField ComputeDisplay;
 	@FXML TextField ValueDisplay;
 	
-	private int puzzleSize;
-	private int[][] puzzle;
-	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
 	}
 	
+	@FXML MenuButton PuzzleSize;
+	private int puzzleSize;
+	
+	/**
+	 * Set the size of the puzzle
+	 * 
+	 * @param size
+	 */
 	public void setPuzzleSize(int size) {
 		puzzleSize = size;
 		PuzzleSize.setText(Integer.toString(size));
-	}
-	
-	public int getPuzzleSize() {
-		return puzzleSize;
-	}
-	
-	public void setPuzzle(int[][] puzz) {
-		puzzle = puzz;
-	}
-	
-	public int[][] getPuzzle() {
-		return puzzle;
 	}
 	
 	//onaction events for menuitems to select size
@@ -76,8 +62,33 @@ public class MyController implements Initializable{
 	public void setSize11(ActionEvent event) {
 		setPuzzleSize(11);
 	}
+		
+	/**
+	 * Get the size of the puzzle
+	 * 
+	 * @return size of puzzle (in input from user)
+	 */
+	public int getPuzzleSize() {
+		return puzzleSize;
+	}
 	
-	//Clicking create puzzle button
+	private int[][] puzzle;
+	
+	public void setPuzzle(int[][] puzz) {
+		puzzle = puzz;
+	}
+	
+	public int[][] getPuzzle() {
+		return puzzle;
+	}
+	
+	/**
+	 * Clicking the 'New Puzzle' Button
+	 * Creates a new puzzle using the input size by user
+	 * Creates an alert if no input size from user
+	 * 
+	 * @param event
+	 */
 	public void createPuzzle(ActionEvent event) {
 		long startTime = Calendar.getInstance().getTimeInMillis();
 		
@@ -85,7 +96,6 @@ public class MyController implements Initializable{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("No Size Selected");
 			alert.setContentText("You must specify a puzzle size.");
-			
 			alert.showAndWait();
 			return;
 		}
@@ -97,54 +107,83 @@ public class MyController implements Initializable{
 		showValue(puzzleMatrix);
 	}
 	
-	//private method to create a new puzzle given the dimensions
-	private int[][] createNewPuzzle(int size) {
-		int n = size;
+	/**
+	 * Create a new puzzle using given input size
+	 * 
+	 * @param n		the dimensions of the puzzle (n by n)
+	 * @return		a randomly generated new puzzle of size n by n
+	 */
+	private int[][] createNewPuzzle(int n) {
 		int[][] puzzle = new int[n][n];
-		
 		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				
-				if (i == n - 1 && j == n - 1) {
+				if ((i == n - 1) && (j == n - 1)) {
 					puzzle[i][j] = 0;
 				} else {
-					puzzle[i][j] = randomLegalValue(n,i,j);
+					puzzle[i][j] = randomLegalValue(n, i, j);
 				}
 			}
 		}
 		
 		return puzzle;
 	}
-	public int randomLegalValue(int size, int i, int j){
-		int mxL=0,mxR=0,mxU=0,mxD=0;
-		int maxValue=0;
-		Random random = new Random();
-		mxL=j;
-		mxR=size-j-1;
-		mxU=i;
-		mxD=size-i-1;
-		maxValue=Math.max(Math.max(mxL,mxR),Math.max(mxU,mxD));
+	
+	/**
+	 * Generates a random legal value for the given cell
+	 * 
+	 * @param size	the dimensions of the puzzle
+	 * @param i		the first index of the chosen square
+	 * @param j		the second index of the chosen square
+	 * @return		a legal integer value for the chosen square
+	 */
+	public int randomLegalValue(int size, int i, int j) {
+		int mxL = j;
+		int mxR = size - j - 1;
+		int mxU = i;
+		int mxD = size - i - 1;
 		
-		return random.nextInt(maxValue)+1;
+		int maxLorR = Math.max(mxL, mxR);
+		int maxUorD = Math.max(mxU, mxD);
+		int maxValue = Math.max(maxLorR, maxUorD);
+		
+		Random random = new Random();
+		int newValue = random.nextInt(maxValue) + 1;
+		
+		return newValue;
 	}
 	
-	//private method for printing the puzzle onto GUI
+	@FXML TextArea PuzzleBox;
+	
+	/**
+	 * Showing the puzzle on the TextArea in the GUI
+	 * 
+	 * @param puzzleMatrix	the puzzle
+	 */
 	private void showPuzzle(int[][] puzzleMatrix) {
 		PuzzleBox.setText("");
-		for (int i = 0; i < puzzleMatrix.length; i++) {
-			for (int j = 0; j < puzzleMatrix[0].length; j++) {
-				if (i == puzzleMatrix.length - 1 && j == puzzleMatrix[0].length - 1) {
+		
+		int n = puzzleMatrix.length;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if ((i == n - 1) && (j == n - 1)) {
 					PuzzleBox.appendText("G");
 				} else {
-					PuzzleBox.appendText(Integer.toString(puzzleMatrix[i][j]) + "\t");
+					String strVal = Integer.toString(puzzleMatrix[i][j]);
+					PuzzleBox.appendText(strVal + "\t");
 				}
 			}
+			
 			PuzzleBox.appendText("\n");
 		}
 	}
 	
-	//Clicking the show puzzle button
+	/**
+	 * Clicking the 'Show Puzzle' button
+	 * Displays the current puzzle onto the GUI
+	 * 
+	 * @param event
+	 */
 	public void showPuzzle(ActionEvent event) {
 		if (getPuzzle() == null) {
 			Alert alert = new Alert(AlertType.ERROR);
@@ -157,7 +196,12 @@ public class MyController implements Initializable{
 		showPuzzle(getPuzzle());
 	}
 	
-	//Clicking the show solution button
+	/**
+	 * Clicking the 'Show Solution' button
+	 * Displays the solution matrix of the current puzzle onto the GUI
+	 * 
+	 * @param event
+	 */
 	public void showSolution(ActionEvent event) {
 		if (getPuzzle() == null) {
 			Alert alert = new Alert(AlertType.ERROR);
@@ -180,7 +224,8 @@ public class MyController implements Initializable{
 					if (val == 0) {
 						PuzzleBox.appendText("X" + "\t");
 					} else {
-						PuzzleBox.appendText(Integer.toString(val) + "\t");
+						String strVal = Integer.toString(val);
+						PuzzleBox.appendText(strVal + "\t");
 					}
 				}
 			}
@@ -189,6 +234,15 @@ public class MyController implements Initializable{
 		}
 	}
 	
+	/**
+	 * Tomer do this
+	 * 
+	 * @param row
+	 * @param column
+	 * @param solutionArray
+	 * @param count
+	 * @param puzzle
+	 */
 	public void doBFS(int row, int column,int[][] solutionArray,int count, int[][] puzzle){
 		int n = puzzle.length;
 		int moves = puzzle[row][column];
@@ -254,11 +308,19 @@ public class MyController implements Initializable{
 		}
 	}
 	
-	//Clicking the Hill Climb button
-	/* Hill Climb button
+	public final String pureHillClimb = "Pure Hill Climb";
+	public final String randomRestarts = "Random Restarts";
+	public final String randomWalk = "Random Walk";
+	public final String simAnneal = "Simulated Annealing";
+	
+	/** 
+	 * Clicking the 'Hill Climb' button
+	 * 
 	 * possible input: number of climbs
 	 * possible input: number of climbs, iterations per climb
 	 * possible input: number of climbs, p value
+	 * Each of the above inputs correspond to Pure Hill Climb, Random Restarts,
+	 * and Random Walk respectively
 	 */
 	public void doHillClimb(ActionEvent event) {
 		if (getPuzzle() == null) {
@@ -270,8 +332,6 @@ public class MyController implements Initializable{
 		}
 		
 		long startTime = Calendar.getInstance().getTimeInMillis();
-		boolean randomRestarts = false;
-		boolean randomWalk = false;
 		
 		int numberOfClimbs = 0;
 		try {
@@ -283,6 +343,9 @@ public class MyController implements Initializable{
 			alert.showAndWait();
 			return;
 		}
+		
+		ImprovementMethodInfo methodInfo = new ImprovementMethodInfo(pureHillClimb, numberOfClimbs);
+		methodInfo.puzzle = getPuzzle();
 
 		int numberOfIterations = 0;
 		if (!numIterations.getText().equals("")) {
@@ -296,7 +359,8 @@ public class MyController implements Initializable{
 				return;
 			}
 			
-			randomRestarts = true;
+			methodInfo.methodName = randomRestarts;
+			methodInfo.itersPerClimb = numberOfIterations;
 		}
 		
 		double pValueInserted = 0;
@@ -319,23 +383,23 @@ public class MyController implements Initializable{
 				return;
 			}
 			
-			randomWalk = true;
+			if (methodInfo.methodName.equals(randomRestarts)) {
+				methodInfo.wasChanged = true;
+			}
+			
+			methodInfo.methodName = randomWalk;
+			methodInfo.p = pValueInserted;
 		}
 		
-		int[][] resultPuzzle = null;
-		if (randomRestarts && randomWalk) {
+		if (methodInfo.wasChanged) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Too many arguements");
 			alert.setContentText("You must either input a p-value for random walk, or number of iterations for random restarts, but not both.");
 			alert.showAndWait();
 			return;
-		} else if (randomRestarts) {
-			resultPuzzle = withRandomRestarts(numberOfClimbs, numberOfIterations);
-		} else if (randomWalk) {
-			resultPuzzle = withRandomWalk(numberOfClimbs, pValueInserted);
-		} else {
-			resultPuzzle = pureHillClimb(numberOfClimbs);
-		}
+		} 
+		
+		int[][] resultPuzzle = getImprovedPuzzle(methodInfo);
 		
 		showComputeTime(startTime);
 		showValue(resultPuzzle);
@@ -343,118 +407,123 @@ public class MyController implements Initializable{
 		showPuzzle(resultPuzzle);
 	}
 	
-	//Pure Hill Climbing, given the number of climbs to do
-	private int[][] pureHillClimb(int numClimbs) {
-		int[][] currPuzzle = getPuzzle();
+	/**
+	 * Getting the new, improved puzzle
+	 * 
+	 * @param method	{@link ImprovementMethodInfo} containing all relevant information
+	 * @return			the new and improved puzzle
+	 */
+	private int[][] getImprovedPuzzle(ImprovementMethodInfo method) {
+		int[][] puzzle = method.puzzle;
+		int n = puzzle.length;
 		
-		Random random = new Random();
-		int n = currPuzzle.length;
-		for (int i = 0; i < numClimbs; i++) {
-			int maxNum = n - 1, minNum = 0;
-			int x = random.nextInt(maxNum - minNum + 1) + minNum;
-			int y = random.nextInt(maxNum - minNum + 1) + minNum;
-			while (x == maxNum && y == maxNum) {
-				x = random.nextInt(maxNum - minNum + 1) + minNum;
-				y = random.nextInt(maxNum - minNum + 1) + minNum;
-			}
+		if (method.methodName.equals(randomRestarts)) {
+			ImprovementMethodInfo pureClimbs = new ImprovementMethodInfo(pureHillClimb, method.itersPerClimb);
+			pureClimbs.puzzle = getPuzzle();
+			int[][] bestPuzzle = puzzle;
 			
-			maxNum = Math.max(n - x, n - y) - 1;
-			minNum = 1;
-			int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-			
-			int currVal = currPuzzle[x][y];
-			int currPuzzleValue = valueFunction(currPuzzle);
-			currPuzzle[x][y] = newVal;
-			int newPuzzleValue = valueFunction(currPuzzle);
-			if (newPuzzleValue < currPuzzleValue) {
-				currPuzzle[x][y] = currVal;
-			}
-		}
-		
-		return currPuzzle;
-	}
-	
-	//Random Walk, given the number of climbs and probability
-	private int[][] withRandomWalk(int numClimbs, double prob) {
-		int[][] currPuzzle = getPuzzle();
-		
-		Random random = new Random();
-		int n = currPuzzle.length;
-		for (int i = 0; i < numClimbs; i++) {
-			int maxNum = n - 1, minNum = 0;
-			int x = random.nextInt(maxNum - minNum + 1) + minNum;
-			int y = random.nextInt(maxNum - minNum + 1) + minNum;
-			while (x == maxNum && y == maxNum) {
-				x = random.nextInt(maxNum - minNum + 1) + minNum;
-				y = random.nextInt(maxNum - minNum + 1) + minNum;
-			}
-			
-			maxNum = Math.max(n - x, n - y) - 1;
-			minNum = 1;
-			int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-			
-			int prevVal = currPuzzle[x][y];
-			int prevPuzzleVal = valueFunction(currPuzzle);
-			currPuzzle[x][y] = newVal;
-			int newPuzzleVal = valueFunction(currPuzzle);
-			
-			if (newPuzzleVal >= prevPuzzleVal) {
-				continue;
-			} else if (random.nextDouble() <= prob) {
-				continue;
-			} else {
-				currPuzzle[x][y] = prevVal;
-			}
-		}
-		
-		return currPuzzle;
-	}
-	
-	//Random Restarts, given the number of climbs and iterations per climb
-	private int[][] withRandomRestarts(int numClimbs, int itsPerClimb) {
-		int[][] currPuzzle = getPuzzle();
-		int[][] bestPuzzle = currPuzzle;
-		
-		Random random = new Random();
-		int n = currPuzzle.length;
-		for (int j = 0; j < numClimbs; j++) {
-			currPuzzle = createNewPuzzle(n);
-			for (int i = 0; i < itsPerClimb; i++) {
-				int maxNum = n - 1, minNum = 0;
-				int x = random.nextInt(maxNum - minNum + 1) + minNum;
-				int y = random.nextInt(maxNum - minNum + 1) + minNum;
-				while (x == maxNum && y == maxNum) {
-					x = random.nextInt(maxNum - minNum + 1) + minNum;
-					y = random.nextInt(maxNum - minNum + 1) + minNum;
+			for (int i = 0; i < method.numClimbs; i++) {
+				puzzle = getImprovedPuzzle(pureClimbs);
+				int currPuzzleValue = valueFunction(puzzle);
+				int bestPuzzleValue = valueFunction(bestPuzzle);
+				
+				if (currPuzzleValue >= bestPuzzleValue) {
+					bestPuzzle = puzzle;
 				}
 				
-				maxNum = Math.max(n - x, n - y) - 1;
-				minNum = 1;
-				int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-		
-				int prevVal = currPuzzle[x][y];
-				int prevPuzzleValue = valueFunction(currPuzzle);
-				currPuzzle[x][y] = newVal;
-				int newPuzzleValue = valueFunction(currPuzzle);
+				pureClimbs.puzzle = createNewPuzzle(n);
+			}
 			
-				if (newPuzzleValue >= prevPuzzleValue) {
-					continue;
-				} else {
-					currPuzzle[x][y] = prevVal;
+			return bestPuzzle;
+		}
+		
+		double currTemp = 0;
+		if (method.methodName.equals(simAnneal)) {
+			currTemp = method.initTemp;
+		}
+		
+		for (int i = 0; i < method.numClimbs; i++) {
+			int[] indexes = getRandomSquare(n);
+			int x = indexes[0];
+			int y = indexes[1];
+			
+			int prevValue = puzzle[x][y];
+			int prevPuzzleValue = valueFunction(puzzle);
+			
+			int newValue = randomLegalValue(n, x, y);
+			puzzle[x][y] = newValue;
+			int newPuzzleValue = valueFunction(puzzle);
+			
+			if (newPuzzleValue >= prevPuzzleValue) {
+				continue;
+			} else {
+				if (method.methodName.equals(randomWalk)) {
+					Random random = new Random();
+					double res = random.nextDouble();
+					
+					if (res <= method.p) {
+						continue;
+					} else {
+						puzzle[x][y] = prevValue;
+					}
+				} 
+				
+				else if (method.methodName.equals(simAnneal)) {
+					Random random = new Random();
+					double numerator = newPuzzleValue - prevPuzzleValue;
+					double power = numerator / currTemp;
+					double prob = Math.pow(Math.E, power);
+					
+					if (random.nextDouble() <= prob) {
+						continue;
+					} else {
+						puzzle[x][y] = prevValue;
+					}
+				}
+				
+				else if (method.methodName.equals(pureHillClimb)) {
+					puzzle[x][y] = prevValue;
 				}
 			}
 			
-			if(valueFunction(currPuzzle) >= valueFunction(bestPuzzle)) {
-				bestPuzzle = currPuzzle;
+			if (method.methodName.equals(simAnneal)) {
+				currTemp = currTemp * method.decay;
 			}
 		}
 		
-		return bestPuzzle;
+		return puzzle;
 	}
 	
-	//Clicking the Simulated Annealing button
-	/* Simulated Annealing
-	 * required inputs: iterations, starting temperature, decay rate
+	/**
+	 * Get the indexes of a randomly picked square in an array
+	 * 
+	 * @param n		the size of the puzzle (n by n)
+	 * @return		[x, y] where x and y are the indexes of the cell in a matrix
+	 */
+	private int[] getRandomSquare(int n) {
+		Random random = new Random();
+		
+		int maxNum = n - 1, minNum = 0;
+		int x = random.nextInt(maxNum - minNum + 1) + minNum;
+		int y = random.nextInt(maxNum - minNum + 1) + minNum;
+		
+		while (x == maxNum && y == maxNum) {
+			x = random.nextInt(maxNum - minNum + 1) + minNum;
+			y = random.nextInt(maxNum - minNum + 1) + minNum;
+		}
+		
+		int[] indexes = new int[2];
+		indexes[0] = x;
+		indexes[1] = y;
+		
+		return indexes;
+	}
+	
+	/**
+	 * Clicking the 'Simulated Annealing' button
+	 * Needs a number of iterations, initial temperature, and decay rate as parameters
+	 * 
+	 * @param event
 	 */
 	public void doSimAnnealing(ActionEvent event){
 		if (getPuzzle() == null) {
@@ -508,43 +577,11 @@ public class MyController implements Initializable{
 			return;
 		}
 		
-		int[][] currPuzzle = getPuzzle();
+		ImprovementMethodInfo methodInfo = new ImprovementMethodInfo(simAnneal, numIterations);
+		methodInfo.initTemp = startTemp;
+		methodInfo.decay = decay;
 		
-		Random random = new Random();
-		int n = currPuzzle.length;
-		for (int i = 0; i < numIterations; i++) {
-			int maxNum = n - 1, minNum = 0;
-			int x = random.nextInt(maxNum - minNum + 1) + minNum;
-			int y = random.nextInt(maxNum - minNum + 1) + minNum;
-			while (x == maxNum && y == maxNum) {
-				x = random.nextInt(maxNum - minNum + 1) + minNum;
-				y = random.nextInt(maxNum - minNum + 1) + minNum;
-			}
-			
-			maxNum = Math.max(n - x, n - y) - 1;
-			minNum = 1;
-			int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-			
-			int currVal = currPuzzle[x][y];
-			int currPuzzleValue = valueFunction(currPuzzle);
-			currPuzzle[x][y] = newVal;
-			int newPuzzleValue = valueFunction(currPuzzle);
-			
-			if (newPuzzleValue >= currPuzzleValue) {
-				continue;
-			} else {
-				double numerator = newPuzzleValue - currPuzzleValue;
-				double power = numerator / startTemp;
-				double prob = Math.pow(Math.E, power);
-				if (random.nextDouble() <= prob) {
-					continue;
-				} else {
-					currPuzzle[x][y] = currVal;
-				}
-			}
-			
-			startTemp = startTemp * decay;
-		}
+		int[][] currPuzzle = getImprovedPuzzle(methodInfo);
 		
 		showComputeTime(startTime);
 		showValue(currPuzzle);
@@ -552,6 +589,11 @@ public class MyController implements Initializable{
 		showPuzzle(currPuzzle);
 	}
 	
+	/**
+	 * Shows the time it took to compute puzzle and solution onto the GUI
+	 * 
+	 * @param startTime		time in milliseconds when computation started
+	 */
 	private void showComputeTime(long startTime) {
 		long currTime = Calendar.getInstance().getTimeInMillis();
 		long elapsed = currTime - startTime;
@@ -559,15 +601,21 @@ public class MyController implements Initializable{
 		ComputeDisplay.setText(Long.toString(elapsed));
 	}
 	
-	//getting solution at goal cell
+	/**
+	 * Getting the value of the puzzle
+	 * 
+	 * @param puzzle		puzzle to get value of
+	 * @return				0 if no solution, otherwise amount of squares necessary to reach goal from start
+	 */
 	private int valueFunction(int[][] puzzle) {
 		int n = puzzle.length;
 		int[][] solArray = new int[n][n];
-		doBFS(0,0,solArray,1,puzzle);
+		doBFS(0, 0, solArray, 1, puzzle);
 		int sol = solArray[n-1][n-1];
 		
 		if (sol == 0) {
 			int numFails = 0;
+			
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < n; j++) {
 					if (solArray[i][j] == 0) {
@@ -582,8 +630,14 @@ public class MyController implements Initializable{
 		return sol;
 	}
 	
-	//placeholder for solution algorithm
-	//returns 0 when no solution
+	/**
+	 * Getting solution at a specific square
+	 * 
+	 * @param puzzle	the puzzle to work with
+	 * @param index1	first index of target square
+	 * @param index2	second index of target square
+	 * @return			amount of squares necessary to reach target square from start square, or 0 if no solution
+	 */
 	private int valueFunction(int[][] puzzle, int index1, int index2) {
 		int n = puzzle.length;
 		int[][] solArray = new int[n][n];
@@ -592,13 +646,19 @@ public class MyController implements Initializable{
 		return solArray[index1][index2];
 	}
 	
+	/**
+	 * Show the value of the given puzzle onto the GUI
+	 * 
+	 * @param puzzle	puzzle to work with
+	 */
 	private void showValue(int[][] puzzle) {
 		ValueDisplay.setText(Integer.toString(valueFunction(puzzle)));
 	}
 	
 	@FXML TextField TargetedChangeIter;
 	
-	/* The only way to reach the goal is by being in one of the squares above
+	/**
+	 * The only way to reach the goal is by being in one of the squares above
 	 * the goal cell, or one of the squares to the left of the goal square.
 	 * Randomly picking one of those squares, and changing that value, targets
 	 * the squares most likely needed to reach the goal cell. It is also a 
@@ -627,11 +687,26 @@ public class MyController implements Initializable{
 		}
 		
 		long startTime = Calendar.getInstance().getTimeInMillis();
+		int[][] puzzle = targetedChange(getPuzzle(), numIterations);
 		
-		int[][] puzzle = getPuzzle();
+		showValue(puzzle);
+		setPuzzle(puzzle);
+		showComputeTime(startTime);
+		showPuzzle(puzzle);
+	}
+	
+	/**
+	 * Implementing Targeted Change
+	 * 
+	 * @param puzzle	the puzzle to start with
+	 * @param numIters	number of iterations
+	 * @return			the new and improved puzzle
+	 */
+	private int[][] targetedChange(int[][] puzzle, int numIters) {
 		int n = puzzle.length;
 		Random random = new Random();
-		for (int i = 0; i < numIterations; i++) {
+		
+		for (int i = 0; i < numIters; i++) {
 			boolean aboveGoalSqr = random.nextDouble() <= 0.5 ? true : false;
 			
 			int min = 0;
@@ -646,7 +721,12 @@ public class MyController implements Initializable{
 			
 			min = 1;
 			max = n - index - 1;
-			int newSquare = random.nextInt(max - min + 1) + min;
+			int newSquare = 0;
+			if (!aboveGoalSqr) {
+				newSquare = randomLegalValue(n, n - 1, index);
+			} else {
+				newSquare = randomLegalValue(n, index, n - 1);
+			}
 			
 			int prevPuzzleValue = valueFunction(puzzle);
 			if (!aboveGoalSqr) {
@@ -665,13 +745,15 @@ public class MyController implements Initializable{
 			}
 		}
 		
-		showValue(puzzle);
-		setPuzzle(puzzle);
-		showComputeTime(startTime);
-		showPuzzle(puzzle);
+		return puzzle;
 	}
 	
-	//reading from file here
+	/**
+	 * Read an input puzzle from a file
+	 * File must be in project
+	 * 
+	 * @param event
+	 */
 	public void puzzleFromFile(ActionEvent event) {
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.setTitle("Filename");
@@ -711,6 +793,13 @@ public class MyController implements Initializable{
 	}
 	
 	@FXML MenuButton PlotChoice;
+	
+	/**
+	 * Clicking the plot button
+	 * Prints 55 x/y values onto system output for given choice
+	 * 
+	 * @param event
+	 */
 	public void generatePlotValues(ActionEvent event) {
 		String plotChoice = PlotChoice.getText();
 		List<Integer> numIters = new ArrayList<Integer>();
@@ -724,7 +813,7 @@ public class MyController implements Initializable{
 			return;
 		}
 		
-		int n = 0;
+		int n = getPuzzle().length;
 		if (plotChoice.equals("Pure Hill Climbing")) {
 			int numberOfClimbs = 0;
 			try {
@@ -737,41 +826,21 @@ public class MyController implements Initializable{
 				return;
 			}
 			
-			int[][] puzzle = getPuzzle();
-			n = puzzle.length;
+			ImprovementMethodInfo methodInfo = new ImprovementMethodInfo(pureHillClimb, numberOfClimbs);
+			methodInfo.puzzle = getPuzzle();
+	
 			for (int k = 0; k < 55; k++) {
-				Random random = new Random();
+				int[][] puzzle = getImprovedPuzzle(methodInfo);
 				
-				for (int i = 0; i < numberOfClimbs; i++) {
-					int maxNum = n - 1, minNum = 0;
-					int x = random.nextInt(maxNum - minNum + 1) + minNum;
-					int y = random.nextInt(maxNum - minNum + 1) + minNum;
-					while (x == maxNum && y == maxNum) {
-						x = random.nextInt(maxNum - minNum + 1) + minNum;
-						y = random.nextInt(maxNum - minNum + 1) + minNum;
-					}
-					
-					maxNum = Math.max(n - x, n - y) - 1;
-					minNum = 1;
-					int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-					
-					int currVal = puzzle[x][y];
-					int currPuzzleValue = valueFunction(puzzle);
-					puzzle[x][y] = newVal;
-					int newPuzzleValue = valueFunction(puzzle);
-					if (newPuzzleValue < currPuzzleValue) {
-						puzzle[x][y] = currVal;
-					}
-				}
-				
-				setPuzzle(puzzle);
 				numIters.add(numberOfClimbs);
 				values.add(valueFunction(puzzle));
 				
-				numberOfClimbs += 10;
-				puzzle = createNewPuzzle(n);
+				methodInfo.numClimbs += 10;
+				methodInfo.puzzle = createNewPuzzle(n);
 			}
-		} else if (plotChoice.equals("Random Restarts")) {
+		} 
+		
+		else if (plotChoice.equals("Random Restarts")) {
 			int numberOfClimbs = 0;
 			try {
 				numberOfClimbs = Integer.parseInt(numClimbs.getText());
@@ -794,51 +863,22 @@ public class MyController implements Initializable{
 				return;
 			}
 			
-			int[][] puzzle = getPuzzle();
-			n = puzzle.length;
+			ImprovementMethodInfo methodInfo = new ImprovementMethodInfo(randomRestarts, numberOfClimbs);
+			methodInfo.puzzle = getPuzzle();
+			methodInfo.itersPerClimb = numberOfIterations;
+			
 			for (int k = 0; k < 55; k++) {
-				Random random = new Random();
-				int[][] bestPuzzle = new int[n][n];
+				int[][] puzzle = getImprovedPuzzle(methodInfo);
 				
-				for (int i = 0; i < numberOfClimbs; i++) {
-					puzzle = createNewPuzzle(n);
-					
-					for (int j = 0; j < numberOfIterations; j++) {
-						int maxNum = n - 1, minNum = 0;
-						int x = random.nextInt(maxNum - minNum + 1) + minNum;
-						int y = random.nextInt(maxNum - minNum + 1) + minNum;
-						while (x == maxNum && y == maxNum) {
-							x = random.nextInt(maxNum - minNum + 1) + minNum;
-							y = random.nextInt(maxNum - minNum + 1) + minNum;
-						}
-						
-						maxNum = Math.max(n - x, n - y) - 1;
-						minNum = 1;
-						int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-						
-						int currVal = puzzle[x][y];
-						int currPuzzleValue = valueFunction(puzzle);
-						puzzle[x][y] = newVal;
-						int newPuzzleValue = valueFunction(puzzle);
-						
-						if (newPuzzleValue < currPuzzleValue) {
-							puzzle[x][y] = currVal;
-						}
-					}
-					
-					if (valueFunction(puzzle) >= valueFunction(bestPuzzle)) {
-						bestPuzzle = puzzle;
-					}
-				}
+				numIters.add(methodInfo.numClimbs);
+				values.add(valueFunction(puzzle));
 				
-				setPuzzle(puzzle);
-				numIters.add(numberOfClimbs);
-				values.add(valueFunction(bestPuzzle));
-				
-				numberOfClimbs += 10;
-				puzzle = createNewPuzzle(n);
+				methodInfo.numClimbs += 10;
+				methodInfo.puzzle = createNewPuzzle(n);
 			}
-		} else if (plotChoice.equals("Random Walk")) {
+		} 
+		
+		else if (plotChoice.equals("Random Walk")) {
 			int numberOfClimbs = 0;
 			try {
 				numberOfClimbs = Integer.parseInt(numClimbs.getText());
@@ -869,42 +909,22 @@ public class MyController implements Initializable{
 				return;
 			}
 			
-			int[][] puzzle = getPuzzle();
-			n = puzzle.length;
+			ImprovementMethodInfo methodInfo = new ImprovementMethodInfo(randomWalk, numberOfClimbs);
+			methodInfo.puzzle = getPuzzle();
+			methodInfo.p = p;
+			
 			for (int k = 0; k < 55; k++) {
-				Random random = new Random();
+				int[][] puzzle = getImprovedPuzzle(methodInfo);
 				
-				for (int i = 0; i < numberOfClimbs; i++) {
-					int maxNum = n - 1, minNum = 0;
-					int x = random.nextInt(maxNum - minNum + 1) + minNum;
-					int y = random.nextInt(maxNum - minNum + 1) + minNum;
-					while (x == maxNum && y == maxNum) {
-						x = random.nextInt(maxNum - minNum + 1) + minNum;
-						y = random.nextInt(maxNum - minNum + 1) + minNum;
-					}
-					
-					maxNum = Math.max(n - x, n - y) - 1;
-					minNum = 1;
-					int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-					
-					int currVal = puzzle[x][y];
-					int currPuzzleValue = valueFunction(puzzle);
-					puzzle[x][y] = newVal;
-					int newPuzzleValue = valueFunction(puzzle);
-					
-					if (newPuzzleValue < currPuzzleValue && random.nextDouble() > p) {
-						puzzle[x][y] = currVal;
-					}
-				}
-				
-				setPuzzle(puzzle);
-				numIters.add(numberOfClimbs);
+				numIters.add(methodInfo.numClimbs);
 				values.add(valueFunction(puzzle));
 				
-				numberOfClimbs += 10;
-				puzzle = createNewPuzzle(n);
+				methodInfo.numClimbs += 10;
+				methodInfo.puzzle = createNewPuzzle(n);
 			}
-		} else if (plotChoice.equals("Simulated Annealing")) {
+		} 
+		
+		else if (plotChoice.equals("Simulated Annealing")) {
 			int numIterations = 0;
 			try {
 				numIterations = Integer.parseInt(numIterationsA.getText());
@@ -946,55 +966,23 @@ public class MyController implements Initializable{
 				return;
 			}
 			
-			int[][] puzzle = getPuzzle();
-			n = puzzle.length;
-			double initTemp = startTemp;
+			ImprovementMethodInfo methodInfo = new ImprovementMethodInfo(simAnneal, numIterations);
+			methodInfo.puzzle = getPuzzle();
+			methodInfo.initTemp = startTemp;
+			methodInfo.decay = decay;
+			
 			for (int k = 0; k < 55; k++) {
-				Random random = new Random();
+				int[][] puzzle = getImprovedPuzzle(methodInfo);
 				
-				for (int i = 0; i < numIterations; i++) {
-					int maxNum = n - 1, minNum = 0;
-					int x = random.nextInt(maxNum - minNum + 1) + minNum;
-					int y = random.nextInt(maxNum - minNum + 1) + minNum;
-					while (x == maxNum && y == maxNum) {
-						x = random.nextInt(maxNum - minNum + 1) + minNum;
-						y = random.nextInt(maxNum - minNum + 1) + minNum;
-					}
-					
-					maxNum = Math.max(n - x, n - y) - 1;
-					minNum = 1;
-					int newVal = random.nextInt(maxNum - minNum + 1) + minNum;
-					
-					int currVal = puzzle[x][y];
-					int currPuzzleValue = valueFunction(puzzle);
-					puzzle[x][y] = newVal;
-					int newPuzzleValue = valueFunction(puzzle);
-					
-					if (newPuzzleValue >= currPuzzleValue) {
-						continue;
-					} else {
-						double numerator = newPuzzleValue - currPuzzleValue;
-						double power = numerator / startTemp;
-						double prob = Math.pow(Math.E, power);
-						if (random.nextDouble() <= prob) {
-							continue;
-						} else {
-							puzzle[x][y] = currVal;
-						}
-					}
-					
-					startTemp = startTemp * decay;
-				}
-				
-				setPuzzle(puzzle);
-				numIters.add(numIterations);
+				numIters.add(methodInfo.numClimbs);
 				values.add(valueFunction(puzzle));
 				
-				numIterations += 10;
-				puzzle = createNewPuzzle(n);
-				startTemp = initTemp;
+				methodInfo.numClimbs += 10;
+				methodInfo.puzzle = createNewPuzzle(n);
 			}
-		} else if (plotChoice.equals("Targeted Change")) {
+		} 
+		
+		else if (plotChoice.equals("Targeted Change")) {
 			int numIterations = 0;
 			try {
 				numIterations = Integer.parseInt(TargetedChangeIter.getText());
@@ -1007,52 +995,18 @@ public class MyController implements Initializable{
 			}
 			
 			int[][] puzzle = getPuzzle();
-			n = puzzle.length;
 			for (int k = 0; k < 55; k++) {
-				Random random = new Random();
+				puzzle = targetedChange(puzzle, numIterations);
 				
-				for (int i = 0; i < numIterations; i++) {
-					boolean aboveGoalSqr = random.nextDouble() <= 0.5 ? true : false;
-					
-					int min = 0;
-					int max = n - 2;
-					int prevSquare;
-					int index = random.nextInt(max - min + 1) + min;
-					if (!aboveGoalSqr) {
-						prevSquare = puzzle[n - 1][index];
-					} else {
-						prevSquare = puzzle[index][n - 1];
-					}
-					
-					min = 1;
-					max = n - index - 1;
-					int newSquare = random.nextInt(max - min + 1) + min;
-					
-					int prevPuzzleValue = valueFunction(puzzle);
-					if (!aboveGoalSqr) {
-						puzzle[n - 1][index] = newSquare;
-					} else {
-						puzzle[index][n - 1] = newSquare;
-					}
-					int newPuzzleValue = valueFunction(puzzle);
-					
-					if (newPuzzleValue < prevPuzzleValue) {
-						if (!aboveGoalSqr) {
-							puzzle[n - 1][index] = prevSquare;
-						} else {
-							puzzle[index][n - 1] = prevSquare;
-						}
-					}
-				}
-				
-				setPuzzle(puzzle);
 				numIters.add(numIterations);
 				values.add(valueFunction(puzzle));
 				
 				numIterations += 10;
 				puzzle = createNewPuzzle(n);
 			}
-		} else {
+		} 
+		
+		else {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Missing choice");
 			alert.setContentText("You must specify what you want to plot first.");
@@ -1089,5 +1043,23 @@ public class MyController implements Initializable{
 	}
 	public void setTargetChange(ActionEvent event) {
 		PlotChoice.setText("Targeted Change");
+	}
+}
+
+class ImprovementMethodInfo {
+	String methodName;
+	int numClimbs;
+	int[][] puzzle;
+	
+	boolean wasChanged;
+	int itersPerClimb;
+	double p;
+	
+	double initTemp;
+	double decay;
+	
+	public ImprovementMethodInfo(String name, int climbs) {
+		methodName = name;
+		numClimbs = climbs;
 	}
 }
