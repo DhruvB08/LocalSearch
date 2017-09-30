@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MyController">
+  <children>
+      <HBox prefHeight="100.0" prefWidth="200.0" />
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" >
+      <children>
+            <Pane layoutX="8.0" layoutY="314.0" prefHeight="97.0" prefWidth="629.0" style="-fx-border-color: black;">
+               <children>
+                  <TextField fx:id="songName" layoutX="7.0" layoutY="40.0" prefHeight="31.0" prefWidth="230.0" promptText="Song Name*" />
+                  <Text layoutX="-12.0" layoutY="88.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Song name" textAlignment="CENTER" wrappingWidth="220.0" />
+                  <Text layoutX="247.0" layoutY="88.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Artist" textAlignment="CENTER" wrappingWidth="94.0" />
+                  <Text layoutX="334.0" layoutY="88.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Year" textAlignment="CENTER" wrappingWidth="94.0" />
+                  <Text layoutX="411.0" layoutY="89.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Album" textAlignment="CENTER" wrappingWidth="94.0" />
+               </children></Pane>
+        <Label alignment="CENTER" layoutX="155.0" layoutY="177.0" style="&#10;" text="Drag components from Library here…" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
+          <font>
+            <Font size="18.0" />
+          </font>
+        </Label>
+            <Button layoutX="547.0" layoutY="355.0" mnemonicParsing="false" onAction="#testingStuff" text="Add Song" />
+            <TextField fx:id="artist" layoutX="254.0" layoutY="355.0" prefHeight="31.0" prefWidth="100.0" promptText="Artist*" />
+            <TextField fx:id="year" layoutX="359.0" layoutY="355.0" prefHeight="31.0" prefWidth="54.0" promptText="Year" />
+            <TextField fx:id="album" layoutX="425.0" layoutY="355.0" prefHeight="31.0" prefWidth="94.0" promptText="Album" />
+            <Text layoutX="14.0" layoutY="350.0" strokeType="OUTSIDE" strokeWidth="0.0" text="* fields are required" />
+            <Button layoutX="212.0" layoutY="319.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="100.0" text="Delete" />
+            <Button layoutX="363.0" layoutY="319.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="100.0" text="Edit" />
+            <Accordion layoutX="26.0" layoutY="35.0" />
+            <ListView layoutX="10.0" layoutY="14.0" prefHeight="292.0" prefWidth="621.0" />
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>
