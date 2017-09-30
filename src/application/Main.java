@@ -1,5 +1,11 @@
 package application;
 	
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -30,6 +36,7 @@ public class Main extends Application {
 		}
 	}
 	
+	static Scanner scanner = new Scanner(System.in);
 	public static void main(String[] args) {
 		launch(args);
 	}
